@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Cette URL doit être définie dans un fichier .env
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  role  String // "professor" ou "admin"
+}
+
+model Class {
+  id       Int       @id @default(autoincrement())
+  name     String
+  year     Int
+  students Student[]
+}
+
+model Student {
+  id          Int          @id @default(autoincrement())
+  name        String
+  classId     Int
+  class       Class        @relation(fields: [classId], references: [id])
+  evaluations Evaluation[] // Relation inverse avec Evaluation
+}
+
+model Skill {
+  id         Int           @id @default(autoincrement())
+  name       String
+  evaluation Evaluation[]
+}
+
+model Evaluation {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  skillId    Int
+  score      Int
+  student    Student  @relation(fields: [studentId], references: [id])
+  skill      Skill    @relation(fields: [skillId], references: [id])
+}
